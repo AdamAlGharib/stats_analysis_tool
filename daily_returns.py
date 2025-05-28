@@ -31,7 +31,7 @@ print(df)
 
 def extract_date_components(timestamp_input) -> dict:
     """
-    Transform a timestamp (string in “YYYY-MM-DD HH:MM:SS” format *or* a
+    Transform a timestamp (string in "YYYY-MM-DD HH:MM:SS" format *or* a
     datetime.datetime object) into a dictionary of calendar-based features.
 
     Parameters
@@ -74,7 +74,7 @@ def extract_date_components(timestamp_input) -> dict:
         "quarter":            (dt.month - 1) // 3 + 1,          # 1–4
         "month_number":       dt.month,                         # 1–12
         "month_name":         dt.strftime("%B"),                # "January"
-        "day_of_week_number": dt.weekday,                      # 1=Mon … 7=Sun
+        "day_of_week_number": dt.weekday(),                    # 1=Mon … 7=Sun
         "day_of_week_name":   dt.strftime("%A"),                # "Monday"…
     }
 
