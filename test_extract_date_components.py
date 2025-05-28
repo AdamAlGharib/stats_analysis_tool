@@ -14,7 +14,8 @@ class TestExtractDateComponents(unittest.TestCase):
             "quarter": 4,
             "month_number": 10,
             "month_name": "October",
-            "day_of_week_number": 3,  # Thursday (0=Mon, 3=Thu)
+            "week_number": 43,  # ISO week number for 2023-10-26
+            "day_of_week_number": 4,  # Thursday (1=Mon, 4=Thu)
             "day_of_week_name": "Thursday"
         }
         self.assertEqual(result, expected)
@@ -28,7 +29,8 @@ class TestExtractDateComponents(unittest.TestCase):
             "quarter": 4,
             "month_number": 10,
             "month_name": "October",
-            "day_of_week_number": 3,  # Thursday
+            "week_number": 43,  # ISO week number
+            "day_of_week_number": 4,  # Thursday (1=Mon, 4=Thu)
             "day_of_week_name": "Thursday"
         }
         self.assertEqual(result, expected)
@@ -38,6 +40,7 @@ class TestExtractDateComponents(unittest.TestCase):
         # Q1
         result_q1 = extract_date_components("2023-01-01 00:00:00")
         self.assertEqual(result_q1["quarter"], 1)
+        self.assertEqual(result_q1["week_number"], 52)  # Jan 1, 2023 is in week 52 of 2022
         
         result_q1_end = extract_date_components("2023-03-31 23:59:59")
         self.assertEqual(result_q1_end["quarter"], 1)
@@ -57,19 +60,20 @@ class TestExtractDateComponents(unittest.TestCase):
     def test_different_days_of_week(self):
         """Test all days of the week."""
         test_cases = [
-            ("2023-10-23 12:00:00", "Monday", 0),
-            ("2023-10-24 12:00:00", "Tuesday", 1),
-            ("2023-10-25 12:00:00", "Wednesday", 2),
-            ("2023-10-26 12:00:00", "Thursday", 3),
-            ("2023-10-27 12:00:00", "Friday", 4),
-            ("2023-10-28 12:00:00", "Saturday", 5),
-            ("2023-10-29 12:00:00", "Sunday", 6),
+            ("2023-10-23 12:00:00", "Monday", 1, 43),
+            ("2023-10-24 12:00:00", "Tuesday", 2, 43),
+            ("2023-10-25 12:00:00", "Wednesday", 3, 43),
+            ("2023-10-26 12:00:00", "Thursday", 4, 43),
+            ("2023-10-27 12:00:00", "Friday", 5, 43),
+            ("2023-10-28 12:00:00", "Saturday", 6, 43),
+            ("2023-10-29 12:00:00", "Sunday", 7, 43),
         ]
         
-        for date_str, expected_day_name, expected_day_num in test_cases:
+        for date_str, expected_day_name, expected_day_num, expected_week in test_cases:
             result = extract_date_components(date_str)
             self.assertEqual(result["day_of_week_name"], expected_day_name)
             self.assertEqual(result["day_of_week_number"], expected_day_num)
+            self.assertEqual(result["week_number"], expected_week)
     
     def test_different_months(self):
         """Test all months of the year."""
@@ -84,6 +88,7 @@ class TestExtractDateComponents(unittest.TestCase):
             result = extract_date_components(date_str)
             self.assertEqual(result["month_number"], month_num)
             self.assertEqual(result["month_name"], month_name)
+            self.assertIn("week_number", result)  # Ensure week_number is present
     
     def test_leap_year(self):
         """Test with leap year date."""
@@ -91,17 +96,40 @@ class TestExtractDateComponents(unittest.TestCase):
         self.assertEqual(result["year"], 2024)
         self.assertEqual(result["month_number"], 2)
         self.assertEqual(result["day_of_week_name"], "Thursday")
+        self.assertEqual(result["day_of_week_number"], 4)  # Thursday = 4
+        self.assertEqual(result["week_number"], 9)  # Week 9 of 2024
     
     def test_edge_cases_time(self):
         """Test edge cases with different times."""
         # Midnight
         result_midnight = extract_date_components("2023-01-01 00:00:00")
         self.assertEqual(result_midnight["year"], 2023)
+        self.assertIn("week_number", result_midnight)
         
         # Just before midnight
         result_late = extract_date_components("2023-12-31 23:59:59")
         self.assertEqual(result_late["year"], 2023)
         self.assertEqual(result_late["month_number"], 12)
+        self.assertIn("week_number", result_late)
+    
+    def test_week_number_edge_cases(self):
+        """Test ISO week number edge cases."""
+        # Test dates where ISO week belongs to different year
+        # Dec 31, 2023 is Sunday, week 52
+        result_end_year = extract_date_components("2023-12-31 12:00:00")
+        self.assertEqual(result_end_year["week_number"], 52)
+        self.assertEqual(result_end_year["day_of_week_number"], 7)  # Sunday
+        
+        # Jan 1, 2024 is Monday, week 1
+        result_new_year = extract_date_components("2024-01-01 12:00:00")
+        self.assertEqual(result_new_year["week_number"], 1)
+        self.assertEqual(result_new_year["day_of_week_number"], 1)  # Monday
+        
+        # Test a date in week 53 (some years have 53 weeks)
+        # 2020-12-28 is Monday of week 53
+        result_week_53 = extract_date_components("2020-12-28 12:00:00")
+        self.assertEqual(result_week_53["week_number"], 53)
+        self.assertEqual(result_week_53["day_of_week_number"], 1)  # Monday
     
     def test_invalid_string_format(self):
         """Test with invalid string formats."""
@@ -147,6 +175,7 @@ class TestExtractDateComponents(unittest.TestCase):
         for date_str, expected_year in test_years:
             result = extract_date_components(date_str)
             self.assertEqual(result["year"], expected_year)
+            self.assertIn("week_number", result)  # Ensure week_number is present
 
 
 if __name__ == "__main__":
