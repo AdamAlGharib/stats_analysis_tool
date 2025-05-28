@@ -69,14 +69,6 @@ def extract_date_components(timestamp_input) -> dict:
             "timestamp_input must be a datetime object or a timestamp string"
         )
 
-    out = df.copy()
-
-    out["year"] = out["timestamp"].dt.year
-    out["month_number"] = out["timestamp"].dt.month
-    out["month_name"] = out["timestamp"].dt.month_name(locale=None)
-    out["day_of_week_numerical"] = out["timestamp"].dt.dayofweek
-    out["day_of_week_name"] = out["timestamp"].dt.day_name(locale=None)
-
     features = {
         "year":               dt.year,
         "quarter":            (dt.month - 1) // 3 + 1,          # 1–4
