@@ -25,8 +25,6 @@ df['timestamp'] = pd.to_datetime(df['timestamp'])
 
 df['Daily Return'] = calculate_daily_returns(df)
 
-print(df)
-
 ## Date Function
 
 def extract_date_components(timestamp_input) -> dict:
@@ -75,8 +73,22 @@ def extract_date_components(timestamp_input) -> dict:
         "month_number":       dt.month,                         # 1–12
         "month_name":         dt.strftime("%B"),                # "January"
         "week_number":         dt.isocalendar().week,         # "January"
-        "day_of_week_number": dt.weekday() + 1,                    # 1=Mon … 7=Sun
+        "day_of_week_number": dt.weekday() + 1,                    # 1=Mon … 7=Sun 
         "day_of_week_name":   dt.strftime("%A"),                # "Monday"…
     }
 
     return features
+
+def create_date_components_df(df) -> pd.DataFrame:
+    # Convert timestamp to datetime
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    # Apply the function to each timestamp and create a DataFrame from the results
+    date_components_df = df['timestamp'].apply(extract_date_components).apply(pd.Series)
+    # Concatenate the new columns with the original DataFrame
+    df = pd.concat([df, date_components_df], axis=1)
+    return df
+
+df=create_date_components_df(df)
+print(df.head())
+# Save the enhanced DataFrame to a new file
+df.to_csv('bitcoin_data_with_date_components.csv', index=False)
