@@ -71,10 +71,10 @@ def extract_date_components(timestamp_input) -> dict:
         "year":               dt.year,
         "quarter":            (dt.month - 1) // 3 + 1,          # 1–4
         "month_number":       dt.month,                         # 1–12
-        "month_name":         dt.strftime("%B"),                # "January"
+        "month_name":         dt.strftime("%B"),                # "January", ("%B" is the full month name)
         "week_number":         dt.isocalendar().week,         # "January"
         "day_of_week_number": dt.weekday() + 1,                    # 1=Mon … 7=Sun 
-        "day_of_week_name":   dt.strftime("%A"),                # "Monday"…
+        "day_of_week_name":   dt.strftime("%A"),                # "Monday"…, ("%A" is the full day name)
     }
 
     return features
