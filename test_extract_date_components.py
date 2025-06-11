@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from daily_returns import extract_date_components
+from date_extraction import extract_date_components
 
 
 class TestExtractDateComponents(unittest.TestCase):

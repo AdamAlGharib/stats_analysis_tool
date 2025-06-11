@@ -8,7 +8,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import functions from daily_returns.py
-from daily_returns import (
+from volatility_metrics import (
     calculate_daily_returns,
     get_return_std_dev,
     get_rolling_volatility,
