@@ -96,8 +96,8 @@ def calculate_volatility_ratio(df: pd.DataFrame, recent_window: int, long_window
         volatility_ratio = calculate_volatility_ratio(df, recent_window=20, long_window=50)
     """
     # Calculate recent returns  
-    recent_atr = calculate_atr(df, recent_window)
-    long_atr = calculate_atr(df, long_window)
+    recent_atr = get_rolling_volatility(df, recent_window)
+    long_atr = get_rolling_volatility(df, long_window)
 
     # Calculate volatility ratio
     volatility_ratio = recent_atr / long_atr
