@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 
-df = pd.read_excel("daily_bitcoin_ohlc.xlsx")
+df = pd.read_csv("top5_daily_ohlcv_since_2018-02-09.csv")
 
 # print(df.head())
 
